@@ -7,13 +7,13 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[clap(author, about="A UDP Test Client")]
 struct Args {
-    /// Server port
-    #[clap(short, long, value_parser, default_value="54321")]
-    port: String,
+    /// Bind IP:Port
+    #[clap(short, long, value_parser, default_value="127.0.0.1:12345")]
+    bind: String,
 
-    /// Server IP
-    #[clap(long, value_parser, default_value="127.0.0.1")]
-    ip: String,
+    /// Server IP:Port
+    #[clap(short, long, value_parser, default_value="127.0.0.1:54321")]
+    server: String,
 
     /// Sending interval in micro seconds
     #[clap(short, long, value_parser, default_value="8")]
@@ -32,10 +32,9 @@ fn busy_wait(expected_us: u128) {
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
-    let socket = UdpSocket::bind("127.0.0.1:53135").expect("failed to bind!");
-    let addr = format!("{}:{}", args.ip, args.port);
-    println!("Connecting to {} ...", &addr);
-    socket.connect(&addr)?;
+    let socket = UdpSocket::bind(args.bind).expect("failed to bind!");
+    println!("Connecting to {} ...", &args.server);
+    socket.connect(&args.server)?;
  
     let mut id: u32 = 0;
     let mut buf: [u8; 1450] = [0; 1450];

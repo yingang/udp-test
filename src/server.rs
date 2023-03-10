@@ -7,25 +7,20 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[clap(author, about="A UDP Test Server")]
 struct Args {
-    /// Listening port
-    #[clap(short, long, value_parser, default_value="54321")]
-    port: String,
-
-    /// Binding IP
-    #[clap(long, value_parser, default_value="127.0.0.1")]
-    ip: String,
+    /// Binding IP:Port
+    #[clap(short, long, value_parser, default_value="127.0.0.1:54321")]
+    bind: String,
 
     /// Checking batch
-    #[clap(short, long, value_parser, default_value="100000")]
+    #[clap(long, value_parser, default_value="100000")]
     batch: i32,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
-    let addr = format!("{}:{}", args.ip, args.port);
-    println!("Listening on {} ...", &addr);
-    let socket = UdpSocket::bind(&addr).expect("Failed to bind!");
+    println!("Listening on {} ...", &args.bind);
+    let socket = UdpSocket::bind(&args.bind).expect("Failed to bind!");
 
     let mut start_time = SystemTime::now();
     let mut buf: [u8; 1500] = [0; 1500];
